@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tsitsi Mulilo — Cloud Computing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --accent: #7fffb2;
+      --accent-dim: #1a3d2b;
+      --text: #e8e8e8;
+      --muted: #888;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      padding: 1.25rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(14,14,14,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 8rem 2rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e0e;
+      font-weight: 500;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-ghost {
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 3rem;
+    }
+
+    .section-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .skill-cell {
+      padding: 1.25rem 1.5rem;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .skill-cell:hover { background: var(--accent-dim); }
+
+    .skill-category {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .skill-items {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .project-card:hover { border-color: #3a3a3a; }
+    .project-card:hover::before { opacity: 1; }
+
+    .project-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 0.75rem; flex-wrap: wrap; gap: 8px;
+    }
+
+    .project-title {
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .project-live {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 10px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 999px;
+      letter-spacing: 0.08em;
+    }
+
+    .project-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.7;
+    }
+
+    .project-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+    }
+
+    .edu-block {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 1rem;
+      padding: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .edu-name { font-size: 1rem; font-weight: 500; margin-bottom: 4px; }
+    .edu-degree { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+    .edu-courses { font-family: var(--mono); font-size: 12px; color: var(--accent); line-height: 2; }
+
+    .edu-year {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .contact-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 1.25rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--mono);
+      transition: all 0.2s;
+    }
+    .contact-card:hover { border-color: var(--accent); color: var(--accent); }
+    .contact-card svg { flex-shrink: 0; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero > * {
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero > *:nth-child(2) { animation-delay: 0.2s; }
+    .hero > *:nth-child(3) { animation-delay: 0.3s; }
+    .hero > *:nth-child(4) { animation-delay: 0.4s; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem; }
+      .nav-links { gap: 1rem; }
+      .hero { padding: 7rem 1.25rem 3rem; }
+      section { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<nav>
+  <div class="nav-logo">tsitsi.mulilo</div>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Cloud Computing & IoT</div>
+  <h1>Tsitsi<br><em>Mulilo.</em></h1>
+  <p class="hero-sub">Computer science student specialising in cloud infrastructure and IoT systems. Currently building on AWS and exploring distributed computing.</p>
+  <div class="hero-links">
+    <a href="https://github.com/tsitsi-cs" class="btn btn-primary" target="_blank">GitHub ↗</a>
+    <a href="#contact" class="btn btn-ghost">Get in touch</a>
+  </div>
+</div>
+
+<section id="skills">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Skills</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-cell">
+      <div class="skill-category">Cloud</div>
+      <div class="skill-items">AWS S3<br>AWS IAM<br>AWS CloudFront<br>Cloud Architecture</div>
+    </div>
+    <div class="skill-cell">
+      <div class="skill-category">Networking</div>
+      <div class="skill-items">TCP/IP<br>DNS<br>Network Security<br>Protocols</div>
+    </div>
+    <div class="skill-cell">
+      <div class="skill-category">Development</div>
+      <div class="skill-items">Python<br>HTML / CSS<br>Linux / Bash<br>Git</div>
+    </div>
+    <div class="skill-cell">
+      <div class="skill-category">Concepts</div>
+      <div class="skill-items">IoT Systems<br>Databases<br>Distributed Systems<br>Cloud Security</div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Projects</h2>
+  </div>
+
+  <div class="project-card">
+    <div class="project-top">
+      <div class="project-title">Personal Portfolio Site</div>
+      <span class="project-live">Live</span>
+    </div>
+    <p class="project-desc">Designed and deployed a personal portfolio website using GitHub Pages for continuous deployment. The site is served globally with fast load times and is automatically updated on every Git push — demonstrating a basic CI/CD workflow.</p>
+    <div class="project-tags">
+      <span class="tag">GitHub Pages</span>
+      <span class="tag">HTML/CSS</span>
+      <span class="tag">CI/CD</span>
+      <span class="tag">DNS</span>
+    </div>
+  </div>
+
+</section>
+
+<section id="education">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Education</h2>
+  </div>
+  <div class="edu-block">
+    <div>
+      <div class="edu-name">University of Zimbabwe</div>
+      <div class="edu-degree">Honours in Cloud Computing & IoT</div>
+      <div class="edu-courses">
+        Computer Networks &nbsp;·&nbsp; Databases<br>
+        Cloud Architecture &nbsp;·&nbsp; IoT Systems<br>
+        CAST AWS Club — Member
+      </div>
+    </div>
+    <div class="edu-year">2024 – 2028</div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Contact</h2>
+  </div>
+  <div class="contact-grid">
+    <a href="https://github.com/tsitsi-cs" class="contact-card" target="_blank">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      github.com/tsitsi-cs
+    </a>
+    <a href="mailto:your.email@gmail.com" class="contact-card">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      your.email@gmail.com
+    </a>
+    <a href="https://linkedin.com/in/tsitsi-mulilo" class="contact-card" target="_blank">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      LinkedIn
+    </a>
+  </div>
+</section>
+
+<footer>
+  Tsitsi Mulilo &nbsp;·&nbsp; Deployed via GitHub Pages &nbsp;·&nbsp; 2025
+</footer>
+
+</body>
+</html>
